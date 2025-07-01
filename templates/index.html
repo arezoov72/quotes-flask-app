@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Quotes Browser</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: #f1f1f1;
+      margin: 40px;
+    }
+    h1 {
+      color: #333;
+    }
+    form input[type="text"],
+    form select {
+      padding: 8px;
+      margin-right: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 8px 16px;
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .quote {
+      background: #fff;
+      margin: 15px 0;
+      padding: 15px 20px;
+      border-left: 4px solid #007BFF;
+      border-radius: 4px;
+    }
+    .quote p {
+      margin: 0;
+      color: #555;
+    }
+    .quote .author {
+      margin-top: 5px;
+      font-weight: bold;
+      color: #007BFF;
+    }
+    .quote .tags {
+      margin-top: 5px;
+      font-size: 0.9em;
+      color: #888;
+    }
+    .pagination {
+      margin-top: 20px;
+    }
+    .pagination a, .pagination strong {
+      margin: 0 5px;
+      text-decoration: none;
+      color: #007BFF;
+    }
+    .pagination strong {
+      font-weight: bold;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <h1>Quotes Browser</h1>
+
+  <form method="get">
+    <input type="text" name="search" placeholder="Search..." value="{{ search_query }}">
+    <select name="tag">
+      <option value="">Filter by tag</option>
+      {% for tag in all_tags %}
+        <option value="{{ tag }}" {% if tag == tag_filter %}selected{% endif %}>{{ tag }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit">Filter</button>
+  </form>
+
+  {% if author_filter %}
+    <p>Showing quotes by <strong>{{ author_filter }}</strong>. 
+      <a href="{{ url_for('index') }}">Show All</a></p>
+  {% endif %}
+
+  {% if tag_filter %}
+    <p>Filtering by tag: <strong>{{ tag_filter }}</strong>.
+      <a href="{{ url_for('index') }}">Clear Tag Filter</a></p>
+  {% endif %}
+
+  {% for q in quotes %}
+    <div class="quote">
+      <p>{{ q.quote }}</p>
+      <p class="author"><a href="{{ url_for('index', author=q.author) }}">{{ q.author }}</a></p>
+      <p class="tags"><em>{{ q.tags }}</em></p>
+    </div>
+  {% else %}
+    <p>No quotes found.</p>
+  {% endfor %}
+
+  <div class="pagination">
+    {% if total_pages > 1 %}
+      {% for p in range(1, total_pages+1) %}
+        {% if p == current_page %}
+          <strong>{{ p }}</strong>
+        {% else %}
+          <a href="{{ url_for('index', search=search_query, author=author_filter, tag=tag_filter, page=p) }}">{{ p }}</a>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  </div>
+
+</body>
+</html>
